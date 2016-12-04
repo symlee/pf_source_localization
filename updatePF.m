@@ -19,6 +19,9 @@ for particle = 1:nParticles
     w_t(particle) = weight(z_t, x_t, P0, n, Xr, varSensor);
 end
 
+% compute an estimate of the effective number of particles
+
+
 % normalize weights and find cdf
 w_t = w_t ./ sum(w_t);
 w_t_cum = cumsum(w_t);
@@ -32,26 +35,26 @@ pf_t = X_t;
 
 end
 function [x_t] = sample(u_t, x_t_1, varMobility)
-    % % mobility model is currently perfect, so can only draw from a
+    % mobility model is currently perfect, so can only draw from a
     % single sample with certainty 
-    % x_t = x_t_1 - u_t;  
+    x_t = x_t_1 - u_t;  
     
-    % sample from gaussian centered around x_t_1 - u_t (input-output map)
-    x_t = normrnd(x_t_1 - u_t, varMobility);
+%     % sample from gaussian centered around x_t_1 - u_t (input-output map)
+%     x_t = normrnd(x_t_1 - u_t, varMobility);
 end
 
 function [w_t] = weight(z_t, x_t, P0, n, Xr, varSensor)
   
-%     if abs(P0 - 10 * n * log10(norm(Xr - x_t)) - z_t) < 0.5
-%         w_t = 1;
-%     else 
-%         w_t = 0;
-%     end
+    if abs(P0 - 10 * n * log10(norm(Xr - x_t)) - z_t) < 0.1
+        w_t = 1;
+    else 
+        w_t = 0;
+    end
 
-    %  sample from gaussian centered around the one ring where you can get a good measurement
-    divergence = P0 - 10 * n * log10(norm(Xr - x_t)) - normrnd(z_t, varSensor);
-    % highest weight given to zero divergence between noisy measurement and
-    % expected measurement given expected source location and noisy position 
-    w_t = normpdf(divergence);
+%     %  sample from gaussian centered around the one ring where you can get a good measurement
+%     divergence = P0 - 10 * n * log10(norm(Xr - x_t)) - normrnd(z_t, varSensor);
+%     % highest weight given to zero divergence between noisy measurement and
+%     % expected measurement given expected source location and noisy position 
+%     w_t = normpdf(divergence);
     
 end

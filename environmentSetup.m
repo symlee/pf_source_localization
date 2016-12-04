@@ -42,22 +42,19 @@ while converged == 0
     trajValid = 0;
     while ~trajValid
         X_proposed = [0 0];
-        goDown = randi([0, 1]);
-        goRight = randi([0, 1]);
+        motion = randi([0, 3]);
         
-        if goDown == 1
-            if goRight == 1
-                u_t = [stepSize -stepSize];     % (x, y)
-            else
-                u_t = [-stepSize -stepSize];
-            end
-        else
-            if goRight == 1
-                u_t = [stepSize stepSize];
-            else
-                u_t = [-stepSize stepSize];
-            end
+        switch motion
+            case 0
+                u_t = [0 stepSize];
+            case 1
+                u_t = [0 -stepSize];
+            case 2
+                u_t = [stepSize 0];
+            case 3
+                u_t = [-stepSize 0];
         end
+
         Xr_proposed = Xr + u_t;
         if (Xr_proposed(1) >= 0 && Xr_proposed(1) <= nGridLengthX && Xr_proposed(2) >= 0 && Xr_proposed(2) <= nGridLengthY)
             trajValid = 1;
