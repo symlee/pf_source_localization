@@ -25,3 +25,11 @@ for j = 1:1000000
 end
 
 count
+
+%% Looking at Normal Distributions of Mobility and Sensor models
+
+x = [-5:0.1:5];
+norm = normpdf(x, 0, 0.5);
+figure(1)
+plot(x, norm)
+
