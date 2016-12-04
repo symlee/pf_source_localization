@@ -54,18 +54,25 @@ while converged == 0
             case 3
                 u_t = [-stepSize 0];
         end
-
+        
+        % check validity of generated trajectory
         Xr_proposed = Xr + u_t;
         if (Xr_proposed(1) >= 0 && Xr_proposed(1) <= nGridLengthX && Xr_proposed(2) >= 0 && Xr_proposed(2) <= nGridLengthY)
             trajValid = 1;
-            Xr = Xr + u_t;
+              Xr_gt = Xr + u_t;
+
+%               % perfect motion model
+%               Xr = Xr_gt;
+            
+            % noisy motion model - sample from gaussian 
+            Xr = normrnd(Xr_gt, varMobility);
         end
     end
     
-    % receive measurement
-    z_t = P0 - 10 * n * log10(norm(Xs - Xr));
+    % receive measurement from where robot actually is
+    z_t = P0 - 10 * n * log10(norm(Xs - Xr_gt));
     
-    pf_t = updatePF(pf_t_1, u_t, z_t, P0, n, Xr, varMobility, varSensor);
+    pf_t = updatePF(pf_t_1, z_t, P0, n, Xr, varSensor);
     
     % plot robot and particles
     figure(1)
