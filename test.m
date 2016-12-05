@@ -33,3 +33,7 @@ norm = normpdf(x, 0, 0.5);
 figure(1)
 plot(x, norm)
 
+%%
+
+source.strength = 10;
+

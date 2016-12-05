@@ -1,13 +1,9 @@
-function [ pf_t ] = updatePF(pf_t_1, z_t, P0, n, Xr, varSensor)
+function [ pf_t ] = updatePF(pf_t_1, z_t, sources, Xr, varSensor)
 %UPDATEPF Summary of this function goes here
 %   Detailed explanation goes here
 
-load('field.mat');
-load('mobility_sensor.mat');
-
 nParticles = size(pf_t_1, 1);
 
-% [X_t, X_t_hat] = deal([]);
 [X_t_hat, X_t] = deal(zeros(size(pf_t_1)));
 w_t = zeros(size(pf_t_1, 1), 1);
 
@@ -16,7 +12,7 @@ for particle = 1:nParticles
     x_t_1 = pf_t_1(particle,:);
     x_t = x_t_1;
     X_t_hat(particle, :) = x_t;
-    w_t(particle) = weight(z_t, x_t, P0, n, Xr, varSensor);
+    w_t(particle) = weight(z_t, x_t, sources, Xr, varSensor);
 end
 
 % normalize weights and find cdf
@@ -41,20 +37,25 @@ function [X_t] = resample(X_t_hat, w_t_cum, X_t)
     end
 end
 
+% affected - need to sample divergence from all known number of sources
+function [w_t] = weight(z_t, x_t, sources, Xr, varSensor)
+    measurementExpected = 0;
+    for j = 1:length(sources)
+        measurementExpected = measurementExpected + sources{j}.str - 10 * sources{j}.n * log10(norm(Xr - x_t));
+    end
+    
 
-function [w_t] = weight(z_t, x_t, P0, n, Xr, varSensor)
 %     % perfect sensor model
-%     if abs(P0 - 10 * n * log10(norm(Xr - x_t)) - z_t) < 0.1
+%     if abs(measurementExpected - z_t) < 0.1
 %         w_t = 1;
 %     else 
 %         w_t = 0;
 %     end
 
     %  sample from gaussian centered around the one ring where you can get a good measurement
-    divergence = P0 - 10 * n * log10(norm(Xr - x_t)) - normrnd(z_t, varSensor);
+    divergence = measurementExpected - normrnd(z_t, varSensor);
     % highest weight given to zero divergence between noisy measurement and
     % expected measurement given expected source location and noisy position 
-    w_t = normpdf(divergence);
-    
+    w_t = normpdf(divergence); 
     
 end
