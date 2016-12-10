@@ -1,6 +1,12 @@
-function [P] = initializePF(nParticles, initDistribution, environmentSize)
+function [P] = initializePF(nSources, nParticles, initDistribution, environmentSize)
 
 P = zeros(nParticles, 2);
+
+% P = cell(1, nSources);
+% for j = 1:nSources
+%      = zeros(nParticles, 2);   % each row is a particle
+%     
+% end
 
 % TODO: might want to later spread out last line of points, dependent on
 % shape of rectangle (taller or wider - currently fills up Y first)
